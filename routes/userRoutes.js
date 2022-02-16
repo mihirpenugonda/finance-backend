@@ -23,7 +23,7 @@ router.route("/find").get(isAuthenticated, findUsers);
 router.route("/register").post(registerUser);
 
 // GET - login user
-router.route("/login").get(loginUser);
+router.route("/login").put(loginUser);
 
 // GET - get user details
 // PUT - edit user details

@@ -154,7 +154,7 @@ exports.getUserFriends = catchAsyncErrors(async (req, res, next) => {
   transactions.forEach((transaction) => {
     transaction.splits.forEach((split) => {
       if (req.requestor_id != split.user) {
-        friends.push(split.user);
+        friends.push(split.user.toString());
       }
     });
   });

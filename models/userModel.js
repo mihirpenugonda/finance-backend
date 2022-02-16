@@ -38,7 +38,7 @@ const userSchema = mongoose.Schema({
   },
   group: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Group"
+    ref: "Group",
   },
   avatar: {
     public_id: {

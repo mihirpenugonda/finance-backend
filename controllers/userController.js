@@ -4,6 +4,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const { sendToken } = require("../utils/sendToken");
 const router = require("../routes/userRoutes");
 const ApiFeatures = require("../utils/apiFeatures");
+const mongoose = require("mongoose")
 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, username, password, email } = req.body;
@@ -50,7 +51,6 @@ exports.findUsers = catchAsyncErrors(async (req, res, next) => {
 
 exports.getUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.requestor_id);
-
   if (!user) return next(new ErrorHandler("user not found", 404));
 
   res.status(200).json({
@@ -62,7 +62,7 @@ exports.getUser = catchAsyncErrors(async (req, res, next) => {
 exports.editUser = catchAsyncErrors(async (req, res, next) => {
   const { username, email, avatar } = req.body;
 
-  await User.findOneAndUpdate(
+  const user = await User.findOneAndUpdate(
     { _id: req.requestor_id },
     {
       $set: {
@@ -70,11 +70,15 @@ exports.editUser = catchAsyncErrors(async (req, res, next) => {
         email: email,
         avatar: avatar,
       },
+    },
+    {
+      new: true
     }
   );
 
   res.status(200).json({
     success: true,
+    user: user.new
   });
 });
 
@@ -128,6 +132,12 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
 });
 
 getUserById = async (req, res, next) => {
+  try {
+    var user_id = (mongoose.Schema.Types.ObjectId) (req.query.user_id)
+  } catch {
+    return next(new ErrorHandler("invalid user id conversion not possible to object id", 500))
+  }
+
   const user = await User.findById(req.query.user_id);
 
   if (!user) return next(new ErrorHandler("user not found", 404));
