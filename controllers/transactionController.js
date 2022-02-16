@@ -25,7 +25,6 @@ exports.createTransaction = catchAsyncErrors(async (req, res, next) => {
     const { splits } = req.body;
 
     const isCorrect = checkTotals(splits, amount);
-
     if (isCorrect) {
       const transaction = await Transaction.create({
         title,
@@ -36,7 +35,6 @@ exports.createTransaction = catchAsyncErrors(async (req, res, next) => {
         splits,
         category,
         date,
-        group,
       });
 
       return res.status(200).json({
@@ -168,15 +166,12 @@ exports.getUserFriends = catchAsyncErrors(async (req, res, next) => {
 });
 
 getUserTransactions = async (req, res, next) => {
-  console.log(req.requestor_id);
   const transactions = await Transaction.find({
     "splits.user": req.requestor_id,
     // completed: false,
   })
     .populate("splits.user", "username")
     .sort("date");
-
-  console.log(transactions);
 
   if (transactions.length == 0)
     return res.status(200).json({
@@ -243,9 +238,10 @@ checkTotals = (splits, amount) => {
     totalAmount += split.amount;
   });
 
-  if (amount - 1 < totalAmount < amount + 1) {
-    return true;
-  }
+  // if (totalAmount > amount - 1 && totalAmount < amount + 1) {
+  //   console.log("HERE");
+  //   return true;
+  // }
 
-  return false;
+  return true;
 };

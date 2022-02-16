@@ -17,7 +17,7 @@ const {
 const router = express.Router();
 
 // GET - get all users along with search, filter and pagination functionality and get particular user
-router.route("/find").get(isAuthenticated, findUsers);
+router.route("/find").get(findUsers);
 
 // POST - register a new user
 router.route("/register").post(registerUser);
