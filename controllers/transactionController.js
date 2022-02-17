@@ -6,47 +6,27 @@ exports.createTransaction = catchAsyncErrors(async (req, res, next) => {
   const { title, description, isSplit, amount, category, date, group } =
     req.body;
 
-  if (!isSplit) {
-    const transaction = await Transaction.create({
-      title,
-      description,
-      initiator: req.requestor_id,
-      amount,
-      category,
-      date,
-      group,
-    });
+  const { splits } = req.body;
 
-    return res.status(200).json({
-      success: true,
-      transaction: transaction,
-    });
-  } else {
-    const { splits } = req.body;
+  const transaction = await Transaction.create({
+    title,
+    description,
+    initiator: req.requestor_id,
+    amount,
+    isSplit,
+    splits,
+    category,
+    date,
+  });
 
-    const isCorrect = checkTotals(splits, amount);
-    if (isCorrect) {
-      const transaction = await Transaction.create({
-        title,
-        description,
-        initiator: req.requestor_id,
-        amount,
-        isSplit,
-        splits,
-        category,
-        date,
-      });
+  return res.status(200).json({
+    success: true,
+    transaction: transaction,
+  });
 
-      return res.status(200).json({
-        success: true,
-        transaction: transaction,
-      });
-    }
-
-    return next(
-      new ErrorHandler("Split Amount is not Equal to Total Amount", 400)
-    );
-  }
+  // return next(
+  //   new ErrorHandler("Split Amount is not Equal to Total Amount", 400)
+  // );
 });
 
 exports.editTransaction = catchAsyncErrors(async (req, res, next) => {
@@ -176,7 +156,7 @@ getUserTransactions = async (req, res, next) => {
   if (transactions.length == 0)
     return res.status(200).json({
       success: true,
-      message: "user does not have any transactions",
+      transactions: [],
     });
 
   res.status(200).json({
@@ -222,7 +202,7 @@ getUserFriendTransactions = async (req, res, next) => {
   if (transactions.length == 0)
     return res.status(200).json({
       success: true,
-      message: "user does not have any transactions",
+      transactions: [],
     });
 
   res.status(200).json({

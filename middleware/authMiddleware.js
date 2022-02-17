@@ -3,19 +3,19 @@ const jwt = require("jsonwebtoken");
 const catchAsyncErrors = require("./asyncErrorMiddleware");
 
 exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
-  if (process.env.STATUS == "TEST") {
-    req.requestor_id = req.body.id;
-    return next();
-  }
+  // if (process.env.STATUS == "TEST") {
+  //   req.requestor_id = req.body.id;
+  //   return next();
+  // }
 
-  const token = req.body.token;
+  const token = req.query.token;
 
   if (!token) {
     return next(new ErrorHandler("please login to access this resource", 401));
   }
 
   // const decodedData = jwt.verify(token, process.env.JWT_TOKEN_KEY);
-  req.requestor_id = req.body.token;
+  req.requestor_id = token;
   next();
 });
 

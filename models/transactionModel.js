@@ -66,7 +66,6 @@ transactionSchema.pre("save", function (next) {
   let isCompleted = true;
 
   splits.forEach((split) => {
-    console.log(split.paid);
     if (split.paid == false) {
       isCompleted = false;
     }
