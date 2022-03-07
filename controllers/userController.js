@@ -4,7 +4,7 @@ const ErrorHandler = require("../utils/errorHandler");
 const { sendToken } = require("../utils/sendToken");
 const router = require("../routes/userRoutes");
 const ApiFeatures = require("../utils/apiFeatures");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { name, username, password, email } = req.body;
@@ -72,13 +72,13 @@ exports.editUser = catchAsyncErrors(async (req, res, next) => {
       },
     },
     {
-      new: true
+      new: true,
     }
   );
 
   res.status(200).json({
     success: true,
-    user: user.new
+    user: user.new,
   });
 });
 
@@ -132,19 +132,14 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
 });
 
 getUserById = async (req, res, next) => {
-  try {
-    var user_id = (mongoose.Schema.Types.ObjectId) (req.query.user_id)
-  } catch {
-    return next(new ErrorHandler("invalid user id conversion not possible to object id", 500))
-  }
-
   const user = await User.findById(req.query.user_id);
+  console.log(user);
 
   if (!user) return next(new ErrorHandler("user not found", 404));
 
   res.status(200).json({
     success: true,
-    user: user,
+    users: [user],
   });
 };
 

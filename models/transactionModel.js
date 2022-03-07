@@ -51,8 +51,7 @@ const transactionSchema = mongoose.Schema({
     default: "uncategorized",
   },
   date: {
-    type: Date,
-    default: Date.now(),
+    type: Number,
   },
   completed: {
     type: Boolean,

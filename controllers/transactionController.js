@@ -148,7 +148,7 @@ exports.getUserFriends = catchAsyncErrors(async (req, res, next) => {
 getUserTransactions = async (req, res, next) => {
   const transactions = await Transaction.find({
     "splits.user": req.requestor_id,
-    // completed: false,
+    completed: false,
   })
     .populate("splits.user", "username")
     .sort("date");
@@ -190,12 +190,12 @@ getUserFriendTransactions = async (req, res, next) => {
     initiator: req.requestor_id,
     "splits.user": req.query.friend_id,
     completed: false,
-  });
+  }).populate("splits.user", "username");
   let second = await Transaction.find({
     initiator: req.query.friend_id,
     "splits.user": req.requestor_id,
     completed: false,
-  });
+  }).populate("splits.user", "username");
 
   const transactions = [...first, ...second];
 
