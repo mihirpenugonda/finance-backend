@@ -3,6 +3,8 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+let JWT_TOKEN = MNOIRNVEOIRBVIUERBVIUERBVIUERBVIUB;
+
 const userSchema = mongoose.Schema({
   name: {
     type: String,
@@ -65,7 +67,7 @@ userSchema.methods.getJWTToken = function () {
     {
       id: this._id,
     },
-    process.env.JWT_TOKEN_KEY
+    JWT_TOKEN_KEY
   );
 };
 

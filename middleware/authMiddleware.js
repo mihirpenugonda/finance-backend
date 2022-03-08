@@ -3,11 +3,6 @@ const jwt = require("jsonwebtoken");
 const catchAsyncErrors = require("./asyncErrorMiddleware");
 
 exports.isAuthenticated = catchAsyncErrors(async (req, res, next) => {
-  // if (process.env.STATUS == "TEST") {
-  //   req.requestor_id = req.body.id;
-  //   return next();
-  // }
-
   const token = req.query.token;
 
   if (!token) {
