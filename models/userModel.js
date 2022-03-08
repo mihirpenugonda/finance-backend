@@ -3,7 +3,6 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-let JWT_TOKEN = MNOIRNVEOIRBVIUERBVIUERBVIUERBVIUB;
 
 const userSchema = mongoose.Schema({
   name: {
@@ -63,11 +62,13 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.getJWTToken = function () {
+  let JWT_TOKEN = "MNOIRNVEOIRBVIUERBVIUERBVIUERBVIUB";
+
   return jwt.sign(
     {
       id: this._id,
     },
-    JWT_TOKEN_KEY
+    JWT_TOKEN
   );
 };
 
