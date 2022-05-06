@@ -27,14 +27,34 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username }).select("+password");
 
-  if (!user) return next(new ErrorHandler("wrong username and password", 404));
+  if (!user)
+    return res.status(401).json({
+      success: false,
+      token: null,
+      id: null,
+      error: "wrong username or password",
+    });
 
   const isMatch = await user.matchPassword(password);
 
   if (!isMatch)
-    return next(new ErrorHandler("wrong username or password", 401));
+    return res.status(401).json({
+      success: false,
+      token: null,
+      id: null,
+      error: "wrong username or password",
+    });
 
   user["password"] = null;
+
+  const token = user.getJWTToken();
+
+  res.status(200).json({
+    success: true,
+    token: token,
+    id: user._id,
+    error: null,
+  });
 
   sendToken(user, 200, res);
 });
@@ -51,7 +71,11 @@ exports.findUsers = catchAsyncErrors(async (req, res, next) => {
 
 exports.getUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.requestor_id);
-  if (!user) return next(new ErrorHandler("user not found", 404));
+  if (!user)
+    return res.status(404).json({
+      success: true,
+      user: null,
+    });
 
   res.status(200).json({
     success: true,
@@ -93,13 +117,17 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
   }
 
   if (!user)
-    return next(new ErrorHandler("user does not exist - invalid token", 404));
+    return res.status(404).json({
+      success: false,
+      error: "user does not exist - invalid token",
+    });
 
   const isMatch = await user.matchPassword(password);
   if (!isMatch) {
-    return next(
-      new ErrorHandler("wrong password - please enter correct password", 403)
-    );
+    return res.status(403).json({
+      success: false,
+      error: "wrong password - please enter correct passwor",
+    });
   }
 
   user.password = new_password;
@@ -107,6 +135,7 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+    error: null,
   });
 });
 
