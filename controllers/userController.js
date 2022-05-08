@@ -2,7 +2,6 @@ const User = require("../models/userModel");
 const catchAsyncErrors = require("../middleware/asyncErrorMiddleware");
 const ErrorHandler = require("../utils/errorHandler");
 const { sendToken } = require("../utils/sendToken");
-const router = require("../routes/userRoutes");
 const ApiFeatures = require("../utils/apiFeatures");
 const mongoose = require("mongoose");
 
@@ -49,14 +48,12 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
 
   const token = user.getJWTToken();
 
-  res.status(200).json({
+  return res.status(200).json({
     success: true,
     token: token,
     id: user._id,
     error: null,
   });
-
-  sendToken(user, 200, res);
 });
 
 exports.findUsers = catchAsyncErrors(async (req, res, next) => {

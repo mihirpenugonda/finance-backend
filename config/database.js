@@ -5,7 +5,7 @@ let DB_URI =
 
 exports.connectDatabase = () => {
   mongoose
-    .connect(process.env.MONGO_URL, {
+    .connect(DB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     })
