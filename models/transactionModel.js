@@ -13,15 +13,10 @@ const transactionSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
-  isSplit: {
-    type: Boolean,
-    default: false,
-    required: true,
-  },
   amount: {
     type: Number,
     required: true,
-    speed: 2,
+    speed: mongoose.SchemaTypes.Double,
   },
   splits: {
     type: [

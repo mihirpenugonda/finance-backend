@@ -3,17 +3,17 @@ const catchAsyncErrors = require("../middleware/asyncErrorMiddleware");
 const ErrorHandler = require("../utils/errorHandler");
 
 exports.createTransaction = catchAsyncErrors(async (req, res, next) => {
-  const { title, description, isSplit, amount, category, date, group } =
-    req.body;
+  const { title, description, amount, category, date, group } = req.body;
 
   const { splits } = req.body;
 
-  const transaction = await Transaction.create({
+  console.log("HEREEEE");
+
+  await Transaction.create({
     title,
     description,
     initiator: req.requestor_id,
     amount,
-    isSplit,
     splits,
     category,
     date,
@@ -21,7 +21,6 @@ exports.createTransaction = catchAsyncErrors(async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    transaction: transaction,
   });
 
   // return next(
@@ -33,7 +32,11 @@ exports.editTransaction = catchAsyncErrors(async (req, res, next) => {
   const { title, description, initiator, isSplit, amount, category, date, id } =
     req.body;
 
-  if (!isSplit) {
+  const { splits } = req.body;
+
+  const isCorrect = checkTotals(splits, amount);
+
+  if (isCorrect) {
     const transaction = await Transaction.findOneAndUpdate(
       {
         _id: id,
@@ -44,6 +47,8 @@ exports.editTransaction = catchAsyncErrors(async (req, res, next) => {
           description,
           initiator,
           amount,
+          isSplit,
+          splits,
           category,
           date,
         },
@@ -53,39 +58,11 @@ exports.editTransaction = catchAsyncErrors(async (req, res, next) => {
     return res.status(200).json({
       success: true,
     });
-  } else {
-    const { splits } = req.body;
-
-    const isCorrect = checkTotals(splits, amount);
-
-    if (isCorrect) {
-      const transaction = await Transaction.findOneAndUpdate(
-        {
-          _id: id,
-        },
-        {
-          $set: {
-            title,
-            description,
-            initiator,
-            amount,
-            isSplit,
-            splits,
-            category,
-            date,
-          },
-        }
-      );
-
-      return res.status(200).json({
-        success: true,
-      });
-    }
-
-    return next(
-      new ErrorHandler("Split Amount is not Equal to Total Amount", 400)
-    );
   }
+
+  return next(
+    new ErrorHandler("Split Amount is not Equal to Total Amount", 400)
+  );
 });
 
 exports.findTransactions = catchAsyncErrors(async (req, res, next) => {
@@ -186,18 +163,22 @@ getGroupTransactions = async (req, res, next) => {
 };
 
 getUserFriendTransactions = async (req, res, next) => {
-  let first = await Transaction.find({
-    initiator: req.requestor_id,
-    "splits.user": req.query.friend_id,
-    completed: false,
-  }).populate("splits.user", "username");
-  let second = await Transaction.find({
-    initiator: req.query.friend_id,
-    "splits.user": req.requestor_id,
-    completed: false,
+  let transactions = await Transaction.find({
+    $or: [
+      {
+        initiator: req.requestor_id,
+        "splits.user": req.query.friend_id,
+        completed: false,
+      },
+      {
+        initiator: req.query.friend_id,
+        "splits.user": req.requestor_id,
+        completed: false,
+      },
+    ],
   }).populate("splits.user", "username");
 
-  const transactions = [...first, ...second];
+  console.log(transactions[1].splits[0]);
 
   if (transactions.length == 0)
     return res.status(200).json({
