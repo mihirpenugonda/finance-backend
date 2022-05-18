@@ -178,8 +178,6 @@ getUserFriendTransactions = async (req, res, next) => {
     ],
   }).populate("splits.user", "username");
 
-  console.log(transactions[1].splits[0]);
-
   if (transactions.length == 0)
     return res.status(200).json({
       success: true,
